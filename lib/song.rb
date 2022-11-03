@@ -3,25 +3,29 @@ require 'active_support/inflector'
 
 class Song
 
-
+#  this class instance gives us songs wich is the table name
   def self.table_name
     self.to_s.downcase.pluralize
   end
 
+  # 
   def self.column_names
     DB[:conn].results_as_hash = true
-
+#pragma= to access the name of the table we are querying
     sql = "pragma table_info('#{table_name}')"
 
     table_info = DB[:conn].execute(sql)
+    # to iterate over the resulting array
     column_names = []
     table_info.each do |row|
       column_names << row["name"]
     end
+    # #compact on that just to be safe and get rid of any nil values that may end up in our collection
     column_names.compact
   end
 
   self.column_names.each do |col_name|
+    #  making sure to convert the column name string into a symbol with the #to_sym
     attr_accessor col_name.to_sym
   end
 
